@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERFECT SHADE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&family=Fahkwang:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="container mx-auto p-8 bg-white rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-center text-stone-800 mb-6">PERFECT SHADE</h1>
+
+        <!-- Main Page -->
+        <div id="main-page">
+            <p class="text-sm text-center text-gray-600 mb-8">
+                เพื่อค้นหาเฉดสีที่เหมาะสมที่สุดสำหรับคุณ กรุณาอัปโหลดรูปภาพจากแกลเลอรี , ถ่ายภาพใบหน้าของคุณ หรือเลือกผลิตภัณฑ์ที่คุณเคยใช้
+            </p>
+
+            <!-- Card for Image/Camera Functionality -->
+            <div class="info-box space-y-6">
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <label for="image-upload" class="cursor-pointer bg-[#B47F53] hover:bg-[#98572A] text-white font-medium text-sm py-3 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg custom-button">
+                        อัปโหลดรูปภาพ
+                    </label>
+                    <input type="file" id="image-upload" accept="image/*" class="hidden">
+                    <button id="camera-button" class="bg-[#98572A] hover:bg-[#7B5C4B] text-white font-medium text-sm py-3 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg custom-button">
+                        ถ่ายรูปภาพ
+                    </button>
+                </div>
+
+                <div class="flex items-center my-6">
+                    <hr class="flex-grow border-t border-[#D1A47C]">
+                    <span class="px-4 text-gray-500 text-xs">หรือ</span>
+                    <hr class="flex-grow border-t border-[#D1A47C]">
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <button id="show-product-page" class="bg-[#E4C6A9] hover:bg-[#D1A47C] text-stone-800 font-medium text-sm py-3 px-6 rounded-full transition duration-300 shadow-md hover:shadow-lg custom-button">
+                        เลือกผลิตภัณฑ์ที่คุณเคยใช้
+                    </button>
+                </div>
+            </div>
+
+            <!-- ส่วนแสดงรูปภาพ/วิดีโอ -->
+            <div id="media-container" class="relative mt-6 flex justify-center items-center">
+                <div id="loading-spinner" class="loading-spinner hidden"></div>
+                <video id="video-feed" class="w-full hidden" autoplay playsinline></video>
+                <canvas id="color-picker-canvas" class="w-full hidden"></canvas>
+            </div>
+            
+            <!-- ปุ่มถ่ายภาพ -->
+            <div class="flex justify-center mt-4">
+                <button id="capture-button" class="bg-[#B47F53] hover:bg-[#98572A] text-white font-medium text-sm py-3 px-6 rounded-full transition duration-300 hidden custom-button">
+                    ถ่ายภาพ
+                </button>
+            </div>
+
+            <!-- ส่วนแสดงผลเฉดสีและคำแนะนำ -->
+            <div id="results-container" class="hidden">
+                <div class="info-box mt-8">
+                    <h2 class="text-xl font-semibold mb-4 text-stone-700 text-center">ผลลัพธ์เฉดสีผิว</h2>
+                    <div class="flex items-center justify-center space-x-4 mb-4">
+                        <div id="selected-color-box" class="w-16 h-16 rounded-full shadow-md border-2 border-[#D1A47C]"></div>
+                    </div>
+                </div>
+
+                <!-- ส่วนเพิ่มใหม่: เลือกผลิตภัณฑ์ที่ต้องการ -->
+                <div class="info-box mt-4 hidden" id="product-filter-container">
+                    <h3 class="text-lg font-semibold mb-3 text-stone-700 text-center">ผลิตภัณฑ์ที่ต้องการ</h3>
+                    <div class="flex flex-col items-center">
+                        <label for="product-filter-dropdown" class="text-sm text-gray-600 mb-2 font-medium">เลือกผลิตภัณฑ์</label>
+                        <select id="product-filter-dropdown" class="w-full p-3 text-sm rounded-full border border-[#D1A47C] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#B47F53] transition duration-300">
+                            <option value="" selected>แสดงทั้งหมด</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="matching-foundations">
+                    <h3 class="text-lg font-medium mb-3 text-stone-700 text-left mt-8">ผลิตภัณฑ์ที่แนะนำ</h3>
+                    <p class="mt-4 text-xs text-gray-500">หมายเหตุ: การเปรียบเทียบเฉดสีนี้เป็นเพียงแนวทางเบื้องต้นในการตัดสินใจ</p>
+                </div>
+
+                <!-- ปุ่มย้อนกลับที่เพิ่มเข้ามา -->
+                <div class="flex justify-center mt-8">
+                    <button id="back-to-start" class="bg-[#D1A47C] hover:bg-[#B47F53] text-stone-800 font-medium text-sm py-3 px-6 rounded-full transition duration-300 custom-button">
+                        ย้อนกลับ
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Page -->
+        <div id="product-page" class="hidden p-6 bg-[#E4C6A9] rounded-lg shadow-inner">
+            <h2 class="text-xl font-bold text-center text-stone-700 mb-6">ค้นหาจากผลิตภัณฑ์ที่คุณเคยใช้</h2>
+
+            <div class="info-box space-y-6">
+                <!-- Product Dropdown -->
+                <div class="flex flex-col items-center">
+                    <label for="product-dropdown" class="text-sm text-gray-600 mb-2 font-medium">เลือกผลิตภัณฑ์</label>
+                    <select id="product-dropdown" class="w-full p-3 text-sm rounded-full border border-[#D1A47C] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#B47F53] transition duration-300">
+                        <option value="" disabled selected>เลือกผลิตภัณฑ์</option>
+                    </select>
+                </div>
+
+                <!-- Shade Dropdown -->
+                <div class="flex flex-col items-center">
+                    <label for="shade-dropdown" class="text-sm text-gray-600 mb-2 font-medium">เลือกเฉดสี</label>
+                    <select id="shade-dropdown" class="w-full p-3 text-sm rounded-full border border-[#D1A47C] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#B47F53] transition duration-300" disabled>
+                        <option value="" disabled selected>เลือกเฉดสี</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="product-results-container" class="hidden">
+                <div class="info-box mt-8">
+                    <h2 class="text-xl font-semibold mb-4 text-stone-700 text-center">ข้อมูลสีผิว</h2>
+                    <div class="flex items-center justify-center space-x-4 mb-4">
+                        <div id="selected-product-color-box" class="w-16 h-16 rounded-full shadow-md border-2 border-[#D1A47C]"></div>
+                    </div>
+                </div>
+                <!-- New section for alternative products -->
+                <div id="alternative-foundations" class="info-box mt-4">
+                    <h3 class="text-lg font-medium mb-3 text-stone-700 text-left">ผลิตภัณฑ์ที่แนะนำจากแบรนด์อื่น</h3>
+                    <div id="alternative-foundations-list" class="text-xs text-gray-500 text-center">เลือกเฉดสีเพื่อหารองพื้นที่ใกล้เคียง</div>
+                </div>
+            </div>
+            
+            <div class="flex justify-center mt-8">
+                <button id="back-to-main" class="bg-[#D1A47C] hover:bg-[#B47F53] text-stone-800 font-medium text-sm py-3 px-6 rounded-full transition duration-300 custom-button">
+                    ย้อนกลับ
+                </button>
+            </div>
+        </div>
+
+        <div id="copy-message" class="copy-message hidden">คัดลอกแล้ว!</div>
+        
+        <!-- Custom Confirmation Modal -->
+        <div id="confirmation-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3 class="text-lg font-bold mb-4">คุณต้องการคัดลอกข้อมูลนี้หรือไม่?</h3>
+                <p class="text-gray-700 text-sm mb-6" id="modal-text-to-copy"></p>
+                <div class="modal-button-group">
+                    <button id="confirm-copy" class="bg-[#B47F53] hover:bg-[#98572A] text-white font-medium text-sm py-2 px-4 rounded-full transition duration-300">
+                        ยืนยัน
+                    </button>
+                    <button id="cancel-copy" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium text-sm py-2 px-4 rounded-full transition duration-300">
+                        ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
